@@ -13,7 +13,7 @@
         }
 
         #left {
-            width: 100px;
+            width: 220px;
             float: left;
             text-align: center;
             font-size: 20px;
@@ -36,6 +36,7 @@
             border-radius: 50% 20% /10% 40%;
             letter-spacing: 2px;
             word-wrap: break-word;
+            align-items: center;
         }
 
         .left-box span {
@@ -54,34 +55,27 @@
         }
 
         #game {
-            border: 2px solid #fff;
-            padding: 50px;
             margin: auto;
             margin-top: 1rem;
             background-image: url('./bg.jpg');
-            height: 800px;
+            width: 1400px;
+            height: 900px;
             background-position: center;
-            background-size: contain;
+            background-size: cover;
             background-repeat: no-repeat;
             overflow: hidden;
             position: relative;
             cursor: url(./stick.png) 50 50, auto;
-            animation: begin 7s;
+            animation: begin 4s;
         }
 
         @keyframes begin {
             from {
                 background-image: url('./wallpaper.jpg');
-                height: 800px;
-                background-repeat: no-repeat;
-                background-size: contain
             }
 
             to {
                 background-image: url('./bg.jpg');
-                height: 800px;
-                background-repeat: no-repeat;
-                background-size: contain
             }
         }
 
@@ -98,7 +92,7 @@
             transition: all 0.4s ease 0s;
             font-family: 'Acme', sans-serif;
             font-size: 20px;
-            cursor: url(./stick.png) 50 50, auto;
+            cursor: url(./stick.png) 100 100, auto;
             border-radius: 6px;
             letter-spacing: 2px;
         }
@@ -113,85 +107,101 @@
             letter-spacing: 3px;
 
         }
+
+        #game img {
+            width: 25%;
+            height: 25%;
+            position: absolute;
+        }
+
+        .fail {
+            background-image: url('./weird.gif');
+        }
     </style>
 </head>
 
 <body>
     <div id="left">
         <p class="left-box"><span>Scores:</span><span id="score">0</span></p>
-        <p class="left-box"><span>Time:</span><span id="timeleft">15</span></p>
+        <p class="left-box"><span>Time:</span><span id="timeleft">20</span></p>
         <img src="./cinderella.png" alt="">
     </div>
-    <div id="game">
-        <input type="button" value="GAME START" id="btn-start">
-
-
-    </div>
+    <div id="game"></div>
     <script src="../../jquery-3.5.0.min.js"></script>
     <script>
+
         let score = 0;
-        let timeleft = 15;
-        let gametimer = 15;
+        let timeleft = 20;
+        let gametimer = 0;
         let cinderella = 0;
         const rand = (num) => {
-            return Math.round(Math.random() * num);
+            return Math.floor(Math.random() * num);
         }
 
         const helpcinderella = (cinderella) => {
-            $(`help${cinderella}`).animate({
-                top: rand(30) + "%",
-                left: rand(30) + "%",
-                width: "30%",
-                height: "auto"
-            }, 3000, function () {
+            $(`#help${cinderella}`).animate({
+                // 隨機移動去那裡的位置
+                top: rand(80) + "%",
+                left: rand(80) + "%",
+            }, 2000, function () {
                 helpcinderella(cinderella);
             })
         }
 
-        $("#btn-start").click(function () {
-            $(this).attr("disable", true);
-            $(this).remove();
-            score = 0;
-            $("#score").text(score);
-            timeleft = 15;
-            $("#timeleft").text(timeleft);
+        setTimeout(() => {
+            $("#game").append(` <input type="button" value="GAME START" id="btn-start">`);
 
-            gametimer = setInterval(() => {
-                timeleft--;
+            $("#btn-start").click(function () {
+                $(this).attr("disable", true);
+                $(this).hide();
+                $("#game").append(`<audio src="./cinderella.mp3" autoplay loop></audio>`);
+                score = 0;
+                $("#score").text(score);
+                timeleft = 20;
                 $("#timeleft").text(timeleft);
-                if (timeleft === 0) {
-                    clearInterval(gametimer);
-                    $(this).attr("disable", false);
-                    setTimeout(() => {
-                        alert("Time's up");
-                    }, 100)
-                    $("#game img").remove();
-                    $("#game").append(`<input type="button" value="GAME START" id="btn-start">`);
 
-                } else {
-                    const num = rand(15);
-                    if (num > 6) {
-                        $("#game").append(`<img src="./magic.gif" id="help${cinderella}">`)
-                        $(`#help${cinderella}`).css({
-                            top: rand(70) + "%",
-                            left: rand(70) + "%",
-                            width: "250px",
-                            height: "156px"
-                        })
-                        move(cinderella);
-                        cinderella++;
+                gametimer = setInterval(() => {
+                    timeleft--;
+                    $("#timeleft").text(timeleft);
+                    if (timeleft == 0) {
+                        clearInterval(gametimer);
+                        $(this).attr("disable", false);
+                        setTimeout(() => {
+                            alert("Time's up");
+                        }, 100);
+                        $("#game img, #game audio").remove();
+                        // $("#game audio").remove();
+                        $(this).show();
+
+                    } else {
+                        const num = rand(20);
+                        if (num > 8) {
+                            $("#game").append(`<img src="./magic.gif" id="help${cinderella}">`);
+                            setTimeout((num) => {
+                                $(`#help${num}`).attr("src", "./weird.gif");
+                            }, 1500, cinderella);
+                            // 隨機初始位置
+                            $(`#help${cinderella}`).css({
+                                top: rand(70) + "%",
+                                left: rand(70) + "%",
+                            })
+                            helpcinderella(cinderella);
+                            cinderella++;
+                        }
                     }
-                }
-            }, 1000)
-        })
+                }, 1000)
+            })
 
-        $("#game").on("click", "img", function () {
-            $(this).attr("src", "./dress.gif", "width", "250px", "height", "150px");
-            $(this).stop();
-            $(this).css("pointer-events", "none");
-            score++;
-            $("#score").text(score);
-        })
+            $("#game").on("click", "img", function () {
+                $(this).attr("src", "./dress.gif");
+                $(this).stop();
+                $(this).css("pointer-events", "none");
+                score++;
+                $("#score").text(score);
+            })
+
+        }, 4000);
+
     </script>
 </body>
 
