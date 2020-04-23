@@ -114,6 +114,10 @@
             position: absolute;
         }
 
+        .success {
+            background-image: url('./dress.gif');
+        }
+
         .fail {
             background-image: url('./weird.gif');
         }
@@ -177,9 +181,6 @@
                         const num = rand(20);
                         if (num > 8) {
                             $("#game").append(`<img src="./magic.gif" id="help${cinderella}">`);
-                            setTimeout((num) => {
-                                $(`#help${num}`).attr("src", "./weird.gif");
-                            }, 1500, cinderella);
                             // 隨機初始位置
                             $(`#help${cinderella}`).css({
                                 top: rand(70) + "%",
@@ -187,7 +188,14 @@
                             })
                             helpcinderella(cinderella);
                             cinderella++;
+                            setTimeout((num) => {
+                                if ($(`#help${num}`).attr("src") == "./magic.gif") {
+                                    $(`#help${num}`).attr("src", "./weird.gif");
+                                }
+                            }, 1500, cinderella);
                         }
+
+
                     }
                 }, 1000)
             })
@@ -199,6 +207,9 @@
                 score++;
                 $("#score").text(score);
             })
+
+
+
 
         }, 4000);
 
